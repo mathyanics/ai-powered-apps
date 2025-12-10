@@ -1,0 +1,33 @@
+# Flask Web Framework
+Flask
+Werkzeug
+
+# AI/ML Libraries
+langchain
+langchain-community
+langchain-core
+langchain-text-splitters
+langchain-huggingface
+
+# Vector Database & Embeddings
+faiss-cpu
+sentence-transformers
+
+# Data Processing
+pandas
+numpy
+pandasql
+openpyxl
+
+# Document Processing
+PyPDF2
+python-pptx
+
+# YouTube Integration
+youtube-transcript-api
+
+# Code Execution API
+requests
+
+# Environment & Utilities
+python-dotenv

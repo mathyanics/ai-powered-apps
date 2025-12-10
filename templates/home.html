@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}Home - AI Learning Hub{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 text-center">
+        <h1 class="display-4 mb-4 fade-in">Welcome to AI Learning Hub</h1>
+        <p class="lead fade-in">Use the navigation menu to explore our features and get started!</p>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 card-clickable" style="animation-delay: 0.1s">
+            <div class="card-body text-center">
+                <i class="bi bi-table display-1 text-primary"></i>
+                <h5 class="card-title mt-3">Dataset Q&A</h5>
+                <p class="card-text">Upload datasets (CSV, Excel, JSON) and ask questions in natural language.</p>
+                <a href="{{ url_for('qna') }}#dataset" class="btn btn-primary btn-pulse">
+                    <i class="bi bi-arrow-right-circle"></i> Get Started
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 card-clickable" style="animation-delay: 0.2s">
+            <div class="card-body text-center">
+                <i class="bi bi-file-earmark-pdf display-1 text-success"></i>
+                <h5 class="card-title mt-3">Document Q&A</h5>
+                <p class="card-text">Upload PDF or PowerPoint files and ask questions about their content.</p>
+                <a href="{{ url_for('qna') }}#document" class="btn btn-success">
+                    <i class="bi bi-file-text"></i> Try Now
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 card-clickable" style="animation-delay: 0.3s">
+            <div class="card-body text-center">
+                <i class="bi bi-youtube display-1 text-danger"></i>
+                <h5 class="card-title mt-3">YouTube Q&A</h5>
+                <p class="card-text">Analyze YouTube videos and ask questions about their content.</p>
+                <a href="{{ url_for('qna') }}#youtube" class="btn btn-danger">
+                    <i class="bi bi-play-circle"></i> Try Now
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6 mb-4">
+        <div class="card h-100 card-clickable" style="animation-delay: 0.4s">
+            <div class="card-body text-center">
+                <i class="bi bi-code-slash display-1 text-warning"></i>
+                <h5 class="card-title mt-3">AI-Powered Coding Exercise</h5>
+                <p class="card-text">Generate custom coding challenges in 13 languages, execute code in real-time, get instant feedback, receive hints, and view detailed explanations.</p>
+                <a href="{{ url_for('qna') }}#coding" class="btn btn-warning">
+                    <i class="bi bi-stars"></i> Start Coding
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <div class="card h-100 card-clickable" style="animation-delay: 0.5s">
+            <div class="card-body text-center">
+                <i class="bi bi-camera-video display-1 text-info"></i>
+                <h5 class="card-title mt-3">Video Interview</h5>
+                <p class="card-text">Practice job interviews with AI, record video responses, get real-time transcription in 15 languages, and receive comprehensive performance feedback.</p>
+                <a href="{{ url_for('qna') }}#interview" class="btn btn-info">
+                    <i class="bi bi-record-circle"></i> Start Interview
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5 fade-in" style="animation-delay: 0.5s">
+    <div class="col-md-12">
+        <div class="alert alert-info">
+            <h5><i class="bi bi-lightbulb"></i> How to Use:</h5>
+            <ul class="mb-0">
+                <li><i class="bi bi-check-circle text-success"></i> <strong>Choose a Feature:</strong> Select Dataset Q&A, Document Q&A, YouTube Q&A, Coding Exercise, or Video Interview from the cards above</li>
+                <li><i class="bi bi-check-circle text-success"></i> <strong>Upload or Provide Content:</strong> Upload files (CSV, Excel, JSON, PDF, PPTX) or paste a YouTube URL</li>
+                <li><i class="bi bi-check-circle text-success"></i> <strong>Ask Questions:</strong> Type your questions in natural language and receive AI-powered answers with source citations</li>
+                <li><i class="bi bi-check-circle text-success"></i> <strong>Practice Coding:</strong> Generate custom exercises in 13 languages, execute code in real-time, get AI feedback, hints, and solutions</li>
+                <li><i class="bi bi-check-circle text-success"></i> <strong>Mock Interviews:</strong> Record video responses to AI-generated questions, use speech-to-text in 15 languages, and receive comprehensive performance analysis</li>
+                <li><i class="bi bi-check-circle text-success"></i> <strong>Explore Results:</strong> View formatted responses with tables, code blocks, mathematical expressions, visual data, and video playback</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4 fade-in" style="animation-delay: 0.5s">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-stars text-warning"></i> Key Features</h5>
+                <div class="row mt-3">
+                    <div class="col-md-3 text-center mb-3">
+                        <i class="bi bi-brain display-4 text-warning"></i>
+                        <h6 class="mt-2">Intelligent Analysis</h6>
+                        <small class="text-muted">RAG & vector search for accurate answers</small>
+                    </div>
+                    <div class="col-md-3 text-center mb-3">
+                        <i class="bi bi-file-earmark-code display-4 text-success"></i>
+                        <h6 class="mt-2">Multi-Format Support</h6>
+                        <small class="text-muted">CSV, Excel, JSON, PDF, PPTX, YouTube</small>
+                    </div>
+                    <div class="col-md-3 text-center mb-3">
+                        <i class="bi bi-chat-dots display-4 text-primary"></i>
+                        <h6 class="mt-2">Natural Language</h6>
+                        <small class="text-muted">Ask questions like talking to an expert</small>
+                    </div>
+                    <div class="col-md-3 text-center mb-3">
+                        <i class="bi bi-mortarboard display-4 text-info"></i>
+                        <h6 class="mt-2">Interactive Learning</h6>
+                        <small class="text-muted">Coding exercises & interview prep</small>
+                    </div>
+                    <div class="col-md-3 text-center mb-3">
+                        <i class="bi bi-globe display-4 text-danger"></i>
+                        <h6 class="mt-2">Multi-Language</h6>
+                        <small class="text-muted">13 coding + 15 speech languages</small>
+                    </div>
+                    <div class="col-md-3 text-center mb-3">
+                        <i class="bi bi-lightning-charge display-4 text-warning"></i>
+                        <h6 class="mt-2">Real-Time Execution</h6>
+                        <small class="text-muted">Cloud-based code runner (Piston API)</small>
+                    </div>
+                    <div class="col-md-3 text-center mb-3">
+                        <i class="bi bi-camera-video display-4 text-primary"></i>
+                        <h6 class="mt-2">Video Recording</h6>
+                        <small class="text-muted">Interview practice with playback</small>
+                    </div>
+                    <div class="col-md-3 text-center mb-3">
+                        <i class="bi bi-mic display-4 text-success"></i>
+                        <h6 class="mt-2">Speech-to-Text</h6>
+                        <small class="text-muted">Real-time transcription (15 languages)</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

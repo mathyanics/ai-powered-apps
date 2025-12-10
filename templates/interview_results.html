@@ -1,0 +1,683 @@
+{% extends "base.html" %}
+
+{% block title %}Interview Results - AI Learning Hub{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-md-12 text-center">
+            <h1 class="display-5"><i class="bi bi-clipboard-check text-success"></i> Interview Performance Report</h1>
+            <p class="lead text-muted">Comprehensive AI Analysis of Your Interview</p>
+        </div>
+    </div>
+
+    <!-- Overall Score Card -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card border-success shadow-lg">
+                <div class="card-body text-center py-4">
+                    <h2 class="mb-3">Overall Performance</h2>
+                    <div class="display-1 mb-3" id="overallScoreDisplay">
+                        <i class="bi bi-hourglass-split"></i>
+                    </div>
+                    <h3 id="recommendationBadge" class="mb-2"></h3>
+                    <p class="text-muted mb-0" id="totalInterviewTime"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Performance Visualization -->
+    <div class="row mb-4">
+        <!-- Spider Chart -->
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-graph-up"></i> Performance Radar</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="performanceSpiderChart" style="max-height: 400px;"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Categorical Ratings (Clickable) -->
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-clipboard-check"></i> BARS Assessment (Click for details)</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-3">
+                        <!-- Communication -->
+                        <button class="btn btn-outline-primary text-start rating-badge" data-category="communication">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="bi bi-chat-dots"></i> <strong>Communication</strong>
+                                </div>
+                                <span class="badge" id="commBadge">--</span>
+                            </div>
+                        </button>
+                        
+                        <!-- Technical Knowledge -->
+                        <button class="btn btn-outline-info text-start rating-badge" data-category="technical">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="bi bi-gear-fill"></i> <strong>Technical Knowledge</strong>
+                                </div>
+                                <span class="badge" id="techBadge">--</span>
+                            </div>
+                        </button>
+                        
+                        <!-- Analytical Ability -->
+                        <button class="btn btn-outline-warning text-start rating-badge" data-category="analytical">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="bi bi-lightbulb-fill"></i> <strong>Analytical Ability</strong>
+                                </div>
+                                <span class="badge" id="analyticBadge">--</span>
+                            </div>
+                        </button>
+                        
+                        <!-- Role Fit -->
+                        <button class="btn btn-outline-success text-start rating-badge" data-category="role_fit">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="bi bi-people-fill"></i> <strong>Role Fit</strong>
+                                </div>
+                                <span class="badge" id="roleFitBadge">--</span>
+                            </div>
+                        </button>
+                        
+                        <!-- Behavioral Presence -->
+                        <button class="btn btn-outline-danger text-start rating-badge" data-category="behavioral">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="bi bi-trophy-fill"></i> <strong>Behavioral Presence</strong>
+                                </div>
+                                <span class="badge" id="behavioralBadge">--</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Detail Modal -->
+    <div class="modal fade" id="ratingDetailModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalCategoryTitle">Category Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert" id="modalCategoryRating"></div>
+                    <h6>Reasoning:</h6>
+                    <div id="modalCategoryReason" class="border rounded p-3 bg-light"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Section (kept from original) -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-star-fill display-4 text-primary"></i>
+                    <h5 class="mt-3">Response Quality</h5>
+                    <div class="progress mt-3" style="height: 25px;">
+                        <div id="rqBar" class="progress-bar bg-primary" role="progressbar"></div>
+                    </div>
+                    <p class="mt-2 mb-0"><strong id="rqScore">--</strong></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card border-info">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-file-text"></i> Performance Summary</h5>
+                </div>
+                <div class="card-body">
+                    <p id="summaryText" class="mb-0" style="font-size: 1.05em; line-height: 1.8;"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Strengths and Improvements -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card border-success h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-check-circle-fill"></i> Key Strengths</h5>
+                </div>
+                <div class="card-body">
+                    <ul id="strengthsList" class="list-group list-group-flush"></ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-warning h-100">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="bi bi-exclamation-triangle-fill"></i> Areas for Improvement</h5>
+                </div>
+                <div class="card-body">
+                    <ul id="improvementsList" class="list-group list-group-flush"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Next Steps -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-signpost-fill"></i> Next Steps & Development Areas</h5>
+                </div>
+                <div class="card-body">
+                    <p id="nextStepsText" class="mb-0" style="font-size: 1.05em; line-height: 1.8;"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Question-by-Question Analysis with Video Playback -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="bi bi-camera-video-fill"></i> Question-by-Question Review</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Tabs -->
+                    <ul class="nav nav-tabs nav-fill mb-4" id="questionTabs" role="tablist">
+                        <!-- Tabs will be generated by JavaScript -->
+                    </ul>
+                    
+                    <!-- Tab Content -->
+                    <div class="tab-content" id="questionTabContent">
+                        <!-- Tab panes will be generated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="row mb-5">
+        <div class="col-md-12 text-center">
+            <a href="{{ url_for('qna') }}#interview" class="btn btn-primary btn-lg me-3">
+                <i class="bi bi-arrow-repeat"></i> New Interview
+            </a>
+            <button onclick="window.print()" class="btn btn-secondary btn-lg me-3">
+                <i class="bi bi-printer"></i> Print Report
+            </button>
+            <a href="{{ url_for('home') }}" class="btn btn-outline-primary btn-lg">
+                <i class="bi bi-house"></i> Back to Home
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Load data from sessionStorage
+    const feedbackData = JSON.parse(sessionStorage.getItem('interviewFeedback'));
+    const questions = JSON.parse(sessionStorage.getItem('interviewQuestions'));
+    const recordedBlobs = JSON.parse(sessionStorage.getItem('recordedBlobs'));
+    
+    if (!feedbackData) {
+        alert('No interview data found. Please complete an interview first.');
+        window.location.href = '{{ url_for("qna") }}';
+        return;
+    }
+    
+    // Check if using BARS methodology or old percentage system
+    const usingBARS = feedbackData.overall_rating !== undefined;
+    
+    // BARS rating to percentage converter for visualization
+    const barsToPercent = {
+        'EXCEPTIONAL': 95,
+        'STRONG': 80,
+        'SATISFACTORY': 65,
+        'DEVELOPING': 45,
+        'UNSATISFACTORY': 25,
+        'N/A': 0
+    };
+    
+    // Display completion rate if available
+    const totalInterviewTime = feedbackData.total_interview_time || 0;
+    const questionsAnswered = feedbackData.questions_answered || 0;
+    const questionsTotal = feedbackData.questions_total || 0;
+    const completionRate = feedbackData.completion_rate || 0;
+    
+    if (questionsAnswered && questionsTotal) {
+        const timeMinutes = Math.floor(totalInterviewTime / 60);
+        const timeSeconds = totalInterviewTime % 60;
+        document.getElementById('totalInterviewTime').textContent = 
+            `Interview completion: ${questionsAnswered}/${questionsTotal} questions (${completionRate}%) • Time: ${timeMinutes}:${String(timeSeconds).padStart(2, '0')}`;
+    } else if (totalInterviewTime > 0) {
+        const timeMinutes = Math.floor(totalInterviewTime / 60);
+        const timeSeconds = totalInterviewTime % 60;
+        document.getElementById('totalInterviewTime').textContent = 
+            `Total time: ${timeMinutes}:${String(timeSeconds).padStart(2, '0')}`;
+    }
+    
+    // Display Overall Score (BARS or percentage)
+    let overallScore, overallDisplay;
+    if (usingBARS) {
+        const rating = feedbackData.overall_rating || 'N/A';
+        overallDisplay = rating;
+        overallScore = barsToPercent[rating] || 0;
+        document.getElementById('overallScoreDisplay').textContent = rating;
+        
+        // Color code the rating
+        const scoreDisplay = document.getElementById('overallScoreDisplay');
+        if (['EXCEPTIONAL', 'STRONG'].includes(rating)) {
+            scoreDisplay.className = 'display-1 mb-3 text-success';
+        } else if (rating === 'SATISFACTORY') {
+            scoreDisplay.className = 'display-1 mb-3 text-info';
+        } else if (rating === 'DEVELOPING') {
+            scoreDisplay.className = 'display-1 mb-3 text-warning';
+        } else {
+            scoreDisplay.className = 'display-1 mb-3 text-danger';
+        }
+    } else {
+        overallScore = feedbackData.overall_score || 0;
+        overallDisplay = overallScore + '%';
+        document.getElementById('overallScoreDisplay').textContent = overallDisplay;
+    }
+    
+    // Display total interview time if available
+    if (feedbackData.total_interview_time) {
+        const totalMinutes = Math.floor(feedbackData.total_interview_time / 60);
+        const totalSeconds = feedbackData.total_interview_time % 60;
+        document.getElementById('totalInterviewTime').textContent = 
+            `Total Time: ${totalMinutes}m ${totalSeconds}s`;
+    }
+    
+    // Display Data Quality Warning if applicable
+    if (feedbackData.data_quality === 'INSUFFICIENT_DATA' || feedbackData.data_quality === 'PARTIAL') {
+        const warningDiv = document.createElement('div');
+        const isInsufficient = feedbackData.data_quality === 'INSUFFICIENT_DATA';
+        
+        warningDiv.className = `alert ${isInsufficient ? 'alert-danger' : 'alert-warning'} alert-dismissible fade show mt-3`;
+        
+        if (isInsufficient) {
+            warningDiv.innerHTML = `
+                <i class="bi bi-exclamation-octagon-fill me-2"></i>
+                <strong>Incomplete Interview:</strong> Less than ${completionRate}% of questions were answered (${questionsAnswered}/${questionsTotal}). 
+                This assessment cannot provide reliable hiring recommendations. Please complete the full interview with all questions answered.
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+        } else {
+            warningDiv.innerHTML = `
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <strong>Partial Data:</strong> Only ${questionsAnswered}/${questionsTotal} questions were answered (${completionRate}%). 
+                Some dimensions may have insufficient data for accurate assessment. Consider retaking the interview for a complete evaluation.
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+        }
+        
+        document.querySelector('.row.mb-4').after(warningDiv);
+    }
+    
+    // Display Recommendation
+    const recommendation = feedbackData.recommendation || 'Under Review';
+    const recBadge = document.getElementById('recommendationBadge');
+    let badgeClass = 'badge ';
+    if (recommendation === 'Strong Hire') {
+        badgeClass += 'bg-success';
+    } else if (recommendation === 'Hire') {
+        badgeClass += 'bg-info';
+    } else if (recommendation === 'Maybe') {
+        badgeClass += 'bg-warning';
+    } else if (recommendation === 'INCOMPLETE_DATA') {
+        badgeClass += 'bg-secondary';
+    } else {
+        badgeClass += 'bg-danger';
+    }
+    recBadge.innerHTML = `<span class="${badgeClass} fs-4 px-4 py-2">${recommendation}</span>`;
+    
+    // Store ratings for spider chart and badges
+    const ratings = {
+        communication: feedbackData.communication_rating || 'N/A',
+        technical: feedbackData.technical_rating || 'N/A',
+        analytical: feedbackData.analytical_rating || 'N/A',
+        role_fit: feedbackData.role_fit_rating || 'N/A',
+        behavioral: feedbackData.behavioral_presence_rating || 'N/A'
+    };
+    
+    const reasons = {
+        communication: feedbackData.communication_reason || 'No details available',
+        technical: feedbackData.technical_reason || 'No details available',
+        analytical: feedbackData.analytical_reason || 'No details available',
+        role_fit: feedbackData.role_fit_reason || 'No details available',
+        behavioral: feedbackData.behavioral_reason || 'No details available'
+    };
+    
+    // Update categorical badges with colors
+    function updateBadge(badgeId, rating) {
+        const badge = document.getElementById(badgeId);
+        badge.textContent = rating;
+        
+        // Color code the badges
+        if (rating === 'EXCEPTIONAL') {
+            badge.className = 'badge bg-success fs-6';
+        } else if (rating === 'STRONG') {
+            badge.className = 'badge bg-info fs-6';
+        } else if (rating === 'SATISFACTORY') {
+            badge.className = 'badge bg-primary fs-6';
+        } else if (rating === 'DEVELOPING') {
+            badge.className = 'badge bg-warning text-dark fs-6';
+        } else if (rating === 'UNSATISFACTORY') {
+            badge.className = 'badge bg-danger fs-6';
+        } else {
+            badge.className = 'badge bg-secondary fs-6';
+        }
+    }
+    
+    updateBadge('commBadge', ratings.communication);
+    updateBadge('techBadge', ratings.technical);
+    updateBadge('analyticBadge', ratings.analytical);
+    updateBadge('roleFitBadge', ratings.role_fit);
+    updateBadge('behavioralBadge', ratings.behavioral);
+    
+    // Create Spider Chart using numerical scores from LLM
+    const ctx = document.getElementById('performanceSpiderChart').getContext('2d');
+    const chartData = {
+        labels: ['Communication', 'Technical', 'Analytical', 'Role Fit', 'Behavioral'],
+        datasets: [{
+            label: 'Performance Level',
+            data: [
+                feedbackData.communication_score || 0,
+                feedbackData.technical_score || 0,
+                feedbackData.analytical_score || 0,
+                feedbackData.role_fit_score || 0,
+                feedbackData.behavioral_presence_score || 0
+            ],
+            backgroundColor: 'rgba(13, 110, 253, 0.2)',
+            borderColor: 'rgba(13, 110, 253, 1)',
+            borderWidth: 2,
+            pointBackgroundColor: 'rgba(13, 110, 253, 1)',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: 'rgba(13, 110, 253, 1)'
+        }]
+    };
+    
+    const config = {
+        type: 'radar',
+        data: chartData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        stepSize: 20,
+                        callback: function(value) {
+                            // Convert back to BARS labels
+                            if (value >= 90) return 'EXCEPTIONAL';
+                            if (value >= 70) return 'STRONG';
+                            if (value >= 50) return 'SATISFACTORY';
+                            if (value >= 30) return 'DEVELOPING';
+                            if (value > 0) return 'UNSATISFACTORY';
+                            return 'N/A';
+                        }
+                    },
+                    pointLabels: {
+                        font: {
+                            size: 12,
+                            weight: 'bold'
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const value = context.parsed.r;
+                            let rating = 'N/A';
+                            if (value >= 90) rating = 'EXCEPTIONAL';
+                            else if (value >= 70) rating = 'STRONG';
+                            else if (value >= 50) rating = 'SATISFACTORY';
+                            else if (value >= 30) rating = 'DEVELOPING';
+                            else if (value > 0) rating = 'UNSATISFACTORY';
+                            return rating;
+                        }
+                    }
+                }
+            }
+        }
+    };
+    
+    new Chart(ctx, config);
+    
+    // Handle clickable badges to show reasoning
+    document.querySelectorAll('.rating-badge').forEach(button => {
+        button.addEventListener('click', function() {
+            const category = this.dataset.category;
+            const modal = new bootstrap.Modal(document.getElementById('ratingDetailModal'));
+            
+            document.getElementById('modalCategoryTitle').textContent = 
+                this.querySelector('strong').textContent;
+            
+            const rating = ratings[category];
+            const ratingAlert = document.getElementById('modalCategoryRating');
+            ratingAlert.className = 'alert ';
+            if (rating === 'EXCEPTIONAL') ratingAlert.className += 'alert-success';
+            else if (rating === 'STRONG') ratingAlert.className += 'alert-info';
+            else if (rating === 'SATISFACTORY') ratingAlert.className += 'alert-primary';
+            else if (rating === 'DEVELOPING') ratingAlert.className += 'alert-warning';
+            else if (rating === 'UNSATISFACTORY') ratingAlert.className += 'alert-danger';
+            else ratingAlert.className += 'alert-secondary';
+            
+            ratingAlert.innerHTML = `<strong>Rating:</strong> ${rating}`;
+            document.getElementById('modalCategoryReason').textContent = reasons[category];
+            
+            modal.show();
+        });
+    });
+    
+    // Display Summary
+    document.getElementById('summaryText').textContent = feedbackData.summary || 'No summary available.';
+    
+    // Display Strengths
+    const strengthsList = document.getElementById('strengthsList');
+    (feedbackData.strengths || []).forEach(strength => {
+        const li = document.createElement('li');
+        li.className = 'list-group-item';
+        li.innerHTML = `<i class="bi bi-check-circle text-success me-2"></i>${strength}`;
+        strengthsList.appendChild(li);
+    });
+    
+    // Display Improvements
+    const improvementsList = document.getElementById('improvementsList');
+    (feedbackData.improvements || []).forEach(improvement => {
+        const li = document.createElement('li');
+        li.className = 'list-group-item';
+        li.innerHTML = `<i class="bi bi-arrow-right-circle text-warning me-2"></i>${improvement}`;
+        improvementsList.appendChild(li);
+    });
+    
+    // Display Next Steps
+    document.getElementById('nextStepsText').textContent = feedbackData.next_steps || 'Continue practicing and refining your interview skills.';
+    
+    // Generate Question Tabs
+    const tabList = document.getElementById('questionTabs');
+    const tabContent = document.getElementById('questionTabContent');
+    
+    (feedbackData.question_feedback || []).forEach((qf, index) => {
+        // Create tab
+        const tabLi = document.createElement('li');
+        tabLi.className = 'nav-item';
+        tabLi.role = 'presentation';
+        
+        const tabButton = document.createElement('button');
+        tabButton.className = 'nav-link' + (index === 0 ? ' active' : '');
+        tabButton.id = `q${index}-tab`;
+        tabButton.setAttribute('data-bs-toggle', 'tab');
+        tabButton.setAttribute('data-bs-target', `#q${index}`);
+        tabButton.type = 'button';
+        tabButton.role = 'tab';
+        tabButton.innerHTML = `<i class="bi bi-${index + 1}-circle"></i> Q${index + 1}`;
+        
+        // Handle BARS rating or percentage score
+        let qScore, qDisplay;
+        if (typeof qf.rating === 'string' && qf.rating !== 'N/A') {
+            // BARS rating
+            qDisplay = qf.rating;
+            qScore = barsToPercent[qf.rating] || 0;
+        } else if (typeof qf.score === 'number') {
+            // Percentage score
+            qScore = qf.score;
+            qDisplay = qScore + '%';
+        } else {
+            // N/A or missing
+            qScore = 0;
+            qDisplay = 'N/A';
+        }
+        
+        // Color code tab based on score
+        if (qScore >= 80 || (typeof qf.rating === 'string' && ['EXCEPTIONAL', 'STRONG'].includes(qf.rating))) {
+            tabButton.classList.add('text-success');
+        } else if (qScore >= 60 || (typeof qf.rating === 'string' && qf.rating === 'SATISFACTORY')) {
+            tabButton.classList.add('text-info');
+        } else if (qScore >= 40 || (typeof qf.rating === 'string' && qf.rating === 'DEVELOPING')) {
+            tabButton.classList.add('text-warning');
+        } else if (qScore > 0) {
+            tabButton.classList.add('text-danger');
+        } else {
+            tabButton.classList.add('text-secondary');
+        }
+        
+        tabLi.appendChild(tabButton);
+        tabList.appendChild(tabLi);
+        
+        // Create tab pane
+        const tabPane = document.createElement('div');
+        tabPane.className = 'tab-pane fade' + (index === 0 ? ' show active' : '');
+        tabPane.id = `q${index}`;
+        tabPane.role = 'tabpanel';
+        
+        // Get video URL if available
+        const videoBlob = recordedBlobs ? recordedBlobs[index] : null;
+        
+        // Determine score display color
+        let scoreColorClass;
+        if (qScore >= 80 || (typeof qf.rating === 'string' && ['EXCEPTIONAL', 'STRONG'].includes(qf.rating))) {
+            scoreColorClass = 'text-success';
+        } else if (qScore >= 60 || (typeof qf.rating === 'string' && qf.rating === 'SATISFACTORY')) {
+            scoreColorClass = 'text-info';
+        } else if (qScore >= 40 || (typeof qf.rating === 'string' && qf.rating === 'DEVELOPING')) {
+            scoreColorClass = 'text-warning';
+        } else if (qScore > 0) {
+            scoreColorClass = 'text-danger';
+        } else {
+            scoreColorClass = 'text-secondary';
+        }
+        
+        tabPane.innerHTML = `
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card border-primary mb-3">
+                        <div class="card-header bg-primary text-white">
+                            <h6 class="mb-0"><i class="bi bi-question-circle"></i> Question</h6>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-0" style="font-size: 1.05em;">${qf.question_text || questions[index]?.question || 'N/A'}</p>
+                        </div>
+                    </div>
+                    
+                    ${videoBlob && videoBlob.url ? `
+                    <div class="card border-secondary mb-3">
+                        <div class="card-header bg-secondary text-white">
+                            <h6 class="mb-0"><i class="bi bi-camera-video"></i> Your Response</h6>
+                        </div>
+                        <div class="card-body text-center">
+                            <video controls style="width: 100%; max-height: 350px; background: #000; border-radius: 8px;">
+                                <source src="${videoBlob.url}" type="video/webm">
+                                Your browser does not support video playback.
+                            </video>
+                        </div>
+                    </div>
+                    ` : ''}
+                    
+                    <div class="card border-info">
+                        <div class="card-header bg-info text-white">
+                            <h6 class="mb-0"><i class="bi bi-star"></i> Rating</h6>
+                        </div>
+                        <div class="card-body text-center">
+                            <div class="display-4 ${scoreColorClass}">${qDisplay}</div>
+                            ${qScore > 0 ? `
+                            <div class="progress mt-3" style="height: 25px;">
+                                <div class="progress-bar ${scoreColorClass.replace('text-', 'bg-')}" 
+                                     style="width: ${qScore}%">${qDisplay}</div>
+                            </div>
+                            ` : '<p class="text-muted mt-2">No data available for assessment</p>'}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card border-success mb-3">
+                        <div class="card-header bg-success text-white">
+                            <h6 class="mb-0"><i class="bi bi-chat-left-text"></i> Detailed Feedback</h6>
+                        </div>
+                        <div class="card-body">
+                            <p style="font-size: 1.05em; line-height: 1.8;">${qf.feedback || 'No feedback available.'}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card border-success mb-3">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0 text-success"><i class="bi bi-check-circle"></i> ${usingBARS ? 'Observable Behaviors' : 'Strengths in This Answer'}</h6>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-0">${qf.observable_behaviors || qf.strengths || 'N/A'}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card border-warning">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0 text-warning"><i class="bi bi-arrow-up-circle"></i> ${usingBARS ? 'Development Areas' : 'How to Improve'}</h6>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-0">${qf.development_areas || qf.improvements || 'N/A'}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        tabContent.appendChild(tabPane);
+    });
+});
+</script>
+
+<style>
+@media print {
+    .btn, .nav-tabs {
+        display: none !important;
+    }
+    video {
+        display: none !important;
+    }
+}
+</style>
+{% endblock %}

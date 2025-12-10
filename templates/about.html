@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}About - AI Learning Hub{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="mb-4">About AI Learning Hub</h1>
+        
+        <div class="card">
+            <div class="card-body">
+                <p class="lead">AI Learning Hub is a comprehensive AI-powered platform that enables intelligent interaction with multiple data sources and provides interactive coding practice with personalized feedback.</p>
+                
+                <h4 class="mt-4"><i class="bi bi-stars text-warning"></i> Core Capabilities:</h4>
+                <ul>
+                    <li><strong>Dataset Q&A:</strong> Upload CSV, Excel, or JSON files and query them using natural language. The system automatically converts your questions to SQL and provides formatted results with data visualizations.</li>
+                    <li><strong>Document Q&A:</strong> Extract insights from PDF and PowerPoint documents using advanced RAG (Retrieval-Augmented Generation) with FAISS vector store. Receive answers with source citations and relevance scores.</li>
+                    <li><strong>YouTube Q&A:</strong> Analyze YouTube video transcripts and ask questions about the content. View embedded videos alongside AI-generated answers based on caption analysis.</li>
+                    <li><strong>AI Coding Exercise:</strong> Generate custom programming challenges tailored to your needs, execute code in 13 programming languages (Python, JavaScript, TypeScript, Java, C++, C#, Go, Rust, PHP, Ruby, Kotlin, Swift, R) using cloud-based Piston API, validate your solutions with instant AI feedback, request hints when stuck, and view detailed solutions with explanations.</li>
+                    <li><strong>Video Interview:</strong> Practice for real job interviews with AI-powered mock sessions. Record video responses with webcam, use real-time speech-to-text in 15 languages (English, Spanish, French, German, Italian, Portuguese, Japanese, Korean, Chinese, Hindi, Arabic), answer role-specific questions (AI Engineer, Product Manager, Software Engineer, Data Scientist, etc.), and receive comprehensive performance analysis with overall/technical/communication scores, strengths, improvement areas, question-by-question feedback with video playback, and hiring recommendations.</li>
+                </ul>
+                
+                <h4 class="mt-4"><i class="bi bi-gear-fill text-primary"></i> Technologies Used:</h4>
+                <ul>
+                    <li><strong>Flask 3.0.0</strong> - Modern Python web framework with session management</li>
+                    <li><strong>LangChain & HuggingFace</strong> - LLM orchestration and embeddings for semantic search</li>
+                    <li><strong>FAISS</strong> - Vector similarity search for document retrieval</li>
+                    <li><strong>Pandas & SQLite</strong> - Data manipulation and in-memory database queries</li>
+                    <li><strong>Piston API</strong> - Cloud-based sandboxed code execution for 13 programming languages</li>
+                    <li><strong>Web Speech API</strong> - Browser-native real-time speech-to-text with 15 language support</li>
+                    <li><strong>MediaRecorder API</strong> - Browser-based video/audio recording for interview sessions</li>
+                    <li><strong>KaTeX</strong> - Mathematical expression rendering</li>
+                    <li><strong>Bootstrap 5</strong> - Responsive UI framework with modern design</li>
+                    <li><strong>YouTube Transcript API</strong> - Automatic caption extraction</li>
+                    <li><strong>PyPDF2 & python-pptx</strong> - Document processing libraries</li>
+                </ul>
+                
+                <h4 class="mt-4"><i class="bi bi-lightbulb text-success"></i> Why AI Learning Hub?</h4>
+                <p>This platform combines the power of large language models with practical data analysis, multi-language coding education, and AI-powered interview preparation. Whether you're exploring datasets, extracting knowledge from documents, learning from videos, practicing programming in 13 languages with real-time execution, or preparing for job interviews with video recording and comprehensive feedback, AI Learning Hub provides an intuitive interface with intelligent assistance every step of the way.</p>
+                
+                <h4 class="mt-4"><i class="bi bi-trophy text-info"></i> Key Features:</h4>
+                <ul>
+                    <li><strong>5 Interactive Modules:</strong> Dataset QnA, Document QnA, YouTube QnA, Coding Exercise, Video Interview</li>
+                    <li><strong>13 Programming Languages:</strong> Run code in Python, JavaScript, TypeScript, Java, C++, C#, Go, Rust, PHP, Ruby, Kotlin, Swift, R</li>
+                    <li><strong>15 Speech Languages:</strong> Interview transcription in English (US/UK), Spanish (Spain/Mexico), French, German, Italian, Portuguese (Brazil/Portugal), Japanese, Korean, Chinese (Simplified/Traditional), Hindi, Arabic</li>
+                    <li><strong>AI-Powered Analysis:</strong> Comprehensive feedback for code submissions and interview performance with detailed scoring</li>
+                    <li><strong>Real-Time Execution:</strong> Cloud-based code execution via Piston API with instant results</li>
+                    <li><strong>Video Recording:</strong> Browser-based webcam recording with playback for interview review</li>
+                </ul>
+                
+                <p class="mt-4 mb-0">
+                    <strong>Developed with ❤️ using Flask and AI</strong>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

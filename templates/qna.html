@@ -1,0 +1,599 @@
+{% extends "base.html" %}
+
+{% block title %}AI Learning Hub - Interactive Learning{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Feature Navigation Tabs (Hidden - use Features dropdown in navbar) -->
+    <ul class="nav nav-tabs nav-fill mb-4" id="featuresTabs" role="tablist" style="display: none;">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="dataset-tab" data-bs-toggle="tab" data-bs-target="#dataset" type="button" role="tab" aria-controls="dataset" aria-selected="true">
+                <i class="bi bi-table"></i> Dataset Q&A
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="document-tab" data-bs-toggle="tab" data-bs-target="#document" type="button" role="tab" aria-controls="document" aria-selected="false">
+                <i class="bi bi-file-earmark-text"></i> Document Q&A
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="youtube-tab" data-bs-toggle="tab" data-bs-target="#youtube" type="button" role="tab" aria-controls="youtube" aria-selected="false">
+                <i class="bi bi-youtube"></i> YouTube Q&A
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="coding-tab" data-bs-toggle="tab" data-bs-target="#coding" type="button" role="tab" aria-controls="coding" aria-selected="false">
+                <i class="bi bi-code-slash"></i> Coding Exercise
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="interview-tab" data-bs-toggle="tab" data-bs-target="#interview" type="button" role="tab" aria-controls="interview" aria-selected="false">
+                <i class="bi bi-person-badge"></i> Interview Exercise
+            </button>
+        </li>
+    </ul>
+
+    <script>
+    // Handle tab activation from URL hash (from Features dropdown navigation)
+    function activateTabFromHash() {
+        const hash = window.location.hash;
+        if (hash) {
+            const targetTab = hash.substring(1); // Remove # symbol
+            const tabButton = document.getElementById(targetTab + '-tab');
+            if (tabButton) {
+                const tab = new bootstrap.Tab(tabButton);
+                tab.show();
+                console.log('Activated tab:', targetTab);
+            }
+        }
+    }
+    
+    // Activate tab on initial page load
+    document.addEventListener('DOMContentLoaded', function() {
+        activateTabFromHash();
+    });
+    
+    // Activate tab when hash changes (navigating between features while on qna page)
+    window.addEventListener('hashchange', function() {
+        console.log('Hash changed to:', window.location.hash);
+        activateTabFromHash();
+    });
+    </script>
+
+    <!-- Tab Content -->
+    <div class="tab-content" id="featuresTabContent">
+        
+        <!-- Dataset Q&A Tab -->
+        <div class="tab-pane fade show active" id="dataset" role="tabpanel">
+            <div class="feature-title mb-4">
+                <h2><i class="bi bi-table"></i> Dataset Q&A</h2>
+                <p class="text-muted">Upload and analyze your datasets with AI-powered insights</p>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="bi bi-cloud-upload"></i> Upload Datasets</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="uploadForm" enctype="multipart/form-data">
+                                <div class="mb-3">
+                                    <label for="fileInput" class="form-label">Select Files (CSV, Excel, JSON)</label>
+                                    <input type="file" class="form-control" id="fileInput" name="files[]" multiple 
+                                           accept=".csv,.xlsx,.json">
+                                    <small class="form-text text-muted">Max 16MB per file</small>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="bi bi-upload"></i> Upload Files
+                                </button>
+                            </form>
+                            
+                            <div id="uploadedFilesInfo" class="mt-3"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-8">
+                    <div class="card" id="datasetChatSection" style="display: none;">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5><i class="bi bi-chat-left-dots"></i> Chat</h5>
+                            <button id="clearDatasetSession" class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-trash"></i> Clear
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div id="chatMessages" class="chat-container mb-3"></div>
+                            
+                            <form id="questionForm">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="questionInput" 
+                                           placeholder="Ask a question about your data..." required>
+                                    <button class="btn btn-primary" type="submit">
+                                        <i class="bi bi-send"></i> Send
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Document Q&A Tab -->
+        <div class="tab-pane fade" id="document" role="tabpanel">
+            <div class="feature-title mb-4">
+                <h2><i class="bi bi-file-earmark-text"></i> Document Q&A</h2>
+                <p class="text-muted">Upload documents (PDF, PowerPoint) and ask questions about their content</p>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="bi bi-file-earmark-pdf"></i> Upload Document</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="docUploadForm" enctype="multipart/form-data">
+                                <div class="mb-3">
+                                    <label for="docFileInput" class="form-label">Select PDF or PPTX</label>
+                                    <input type="file" class="form-control" id="docFileInput" name="document" 
+                                           accept=".pdf,.ppt,.pptx" required>
+                                    <small class="form-text text-muted">Max 16MB per file</small>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="bi bi-upload"></i> Upload & Process
+                                </button>
+                            </form>
+                            
+                            <div id="docInfo" class="mt-3"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-8">
+                    <div class="card" id="documentChatSection" style="display: none;">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5><i class="bi bi-chat-left-dots"></i> Document Chat</h5>
+                            <button id="clearDocSession" class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-trash"></i> Clear
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div id="docChatMessages" class="chat-container mb-3"></div>
+                            
+                            <form id="docQuestionForm">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="docQuestionInput" 
+                                           placeholder="Ask a question about the document..." required>
+                                    <button class="btn btn-primary" type="submit">
+                                        <i class="bi bi-send"></i> Send
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- YouTube Q&A Tab -->
+        <div class="tab-pane fade" id="youtube" role="tabpanel">
+            <div class="feature-title mb-4">
+                <h2><i class="bi bi-youtube"></i> YouTube Q&A</h2>
+                <p class="text-muted">Analyze YouTube videos and ask questions about their content</p>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="bi bi-youtube"></i> Analyze Video</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="youtubeForm">
+                                <div class="mb-3">
+                                    <label for="videoUrl" class="form-label">YouTube Video URL</label>
+                                    <input type="url" class="form-control" id="videoUrl" 
+                                           placeholder="https://www.youtube.com/watch?v=..." required>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="bi bi-play-circle"></i> Analyze Video Content
+                                </button>
+                            </form>
+                            
+                            <div id="videoPreview" class="mt-3"></div>
+                            <div id="ytLoadingSpinner" class="text-center mt-3" style="display:none;">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-2">Analyzing video...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-8">
+                    <div id="youtubeQaSection" style="display:none;">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5><i class="bi bi-chat-left-dots"></i> Video Chat</h5>
+                                <button id="clearYoutubeSession" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i> Clear
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div id="ytChatMessages" class="chat-container mb-3"></div>
+                                
+                                <form id="ytQuestionForm">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="ytQuestionInput" 
+                                               placeholder="Ask about the video..." required>
+                                        <button class="btn btn-primary" type="submit">
+                                            <i class="bi bi-send"></i> Send
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Coding Exercise Tab -->
+        <div class="tab-pane fade" id="coding" role="tabpanel">
+            <div class="feature-title mb-4">
+                <h2><i class="bi bi-code-slash"></i> Coding Exercise</h2>
+                <p class="text-muted">Practice coding with AI-generated challenges tailored to your skill level</p>
+            </div>
+            <div class="row">
+                <div class="col-md-5">
+                    <div class="card mb-3" id="generateExerciseCard">
+                        <div class="card-header">
+                            <h5><i class="bi bi-lightning"></i> Generate Exercise</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="codingGenerateForm">
+                                <div class="mb-3">
+                                    <label for="codingTopic" class="form-label">Topic/Concept</label>
+                                    <input type="text" class="form-control" id="codingTopic" 
+                                           placeholder="e.g., Arrays, Recursion, Binary Search..." required>
+                                    <small class="form-text text-muted">What concept do you want to practice?</small>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="codingDifficulty" class="form-label">Difficulty</label>
+                                    <select class="form-select" id="codingDifficulty">
+                                        <option value="beginner">Beginner</option>
+                                        <option value="intermediate">Intermediate</option>
+                                        <option value="advanced">Advanced</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="codingLanguage" class="form-label">Programming Language</label>
+                                    <select class="form-select" id="codingLanguage">
+                                        <option value="python">Python ✓</option>
+                                        <option value="javascript">JavaScript</option>
+                                        <option value="typescript">TypeScript</option>
+                                        <option value="java">Java</option>
+                                        <option value="cpp">C++</option>
+                                        <option value="c">C</option>
+                                        <option value="csharp">C#</option>
+                                        <option value="go">Go</option>
+                                        <option value="rust">Rust</option>
+                                        <option value="kotlin">Kotlin</option>
+                                        <option value="ruby">Ruby</option>
+                                        <option value="php">PHP</option>
+                                        <option value="swift">Swift</option>
+                                    </select>
+                                    <small class="form-text text-muted" id="languageInfo"><i class="bi bi-cloud"></i> Checking language availability...</small>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="bi bi-stars"></i> Generate Exercise
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Regenerate Challenge Button (shown after exercise generation) -->
+                    <div class="card mb-3" id="regenerateChallengeCard" style="display: none;">
+                        <div class="card-body text-center">
+                            <button id="regenerateChallengeBtn" class="btn btn-outline-primary btn-lg w-100">
+                                <i class="bi bi-arrow-clockwise"></i> Regenerate Challenge
+                            </button>
+                            <small class="text-muted d-block mt-2">Create a new coding exercise</small>
+                        </div>
+                    </div>
+
+                    <!-- Exercise Display -->
+                    <div id="exerciseDisplay" class="card" style="display: none;">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5><i class="bi bi-file-code"></i> Exercise</h5>
+                            <div id="exerciseButtons" style="display: none;">
+                                <button id="getHintBtn" class="btn btn-sm btn-outline-info me-2">
+                                    <i class="bi bi-lightbulb"></i> Hint
+                                </button>
+                                <button id="getSolutionBtn" class="btn btn-sm btn-outline-success">
+                                    <i class="bi bi-check-circle"></i> Solution
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body" id="exerciseContent">
+                            <!-- Exercise content will be displayed here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Test Cases Display -->
+                    <div id="testCasesDisplay" class="card mt-3" style="display: none;">
+                        <div class="card-header bg-secondary text-white">
+                            <h6 class="mb-0"><i class="bi bi-list-check"></i> Available Test Cases</h6>
+                        </div>
+                        <div class="card-body" id="testCasesContent">
+                            <!-- Test cases will be displayed here -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-7">
+                    <div class="card" id="codingSolutionBoard" style="display: none;">
+                        <div class="card-header">
+                            <h5><i class="bi bi-code-square"></i> Your Solution</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="codingSubmitForm">
+                                <div class="mb-3">
+                                    <label for="codeEditor" class="form-label">Write your code here:</label>
+                                    <textarea class="form-control font-monospace" id="codeEditor" rows="15" 
+                                              placeholder="// Write your solution here...
+// Make sure to test your code with the provided examples"></textarea>
+                                </div>
+                                
+
+                                
+                                <div class="row g-2">
+                                    <div class="col-md-6">
+                                        <button type="button" id="runCodeBtn" class="btn btn-primary btn-lg w-100">
+                                            <i class="bi bi-play-circle"></i> Run Code
+                                        </button>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <button type="submit" class="btn btn-success btn-lg w-100">
+                                            <i class="bi bi-check2-circle"></i> Submit & Get AI Feedback
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Test Results Display -->
+                    <div id="testResultsDisplay" class="card mt-3" style="display: none;">
+                        <div class="card-header bg-primary text-white" onclick="toggleTestResults()" style="cursor: pointer;">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0"><i class="bi bi-terminal"></i> Test Results</h5>
+                                <i class="bi bi-chevron-down" id="testResultsToggleIcon"></i>
+                            </div>
+                        </div>
+                        <div class="card-body collapsible-content" id="testResultsContent">
+                            <!-- Test results will be displayed here -->
+                        </div>
+                    </div>
+
+                    <!-- Feedback Display -->
+                    <div id="feedbackDisplay" class="card mt-3" style="display: none;">
+                        <div class="card-header bg-info text-white" onclick="toggleFeedback()" style="cursor: pointer;">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0"><i class="bi bi-clipboard-check"></i> AI Feedback</h6>
+                                <i class="bi bi-chevron-down" id="feedbackToggleIcon"></i>
+                            </div>
+                        </div>
+                        <div class="card-body collapsible-content" id="feedbackContent">
+                            <!-- Feedback will be displayed here -->
+                        </div>
+                    </div>
+
+                    <!-- Hint Display -->
+                    <div id="hintDisplay" class="card mt-3" style="display: none;">
+                        <div class="card-header bg-info text-white" onclick="toggleHint()" style="cursor: pointer;">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0"><i class="bi bi-lightbulb"></i> Hint</h6>
+                                <i class="bi bi-chevron-down" id="hintToggleIcon"></i>
+                            </div>
+                        </div>
+                        <div class="card-body collapsible-content" id="hintContent">
+                            <!-- Hint will be displayed here -->
+                        </div>
+                    </div>
+
+                    <!-- Solution Display -->
+                    <div id="solutionDisplay" class="card mt-3" style="display: none;">
+                        <div class="card-header bg-success text-white" onclick="toggleSolution()" style="cursor: pointer;">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0"><i class="bi bi-check-circle"></i> Complete Solution</h6>
+                                <i class="bi bi-chevron-down" id="solutionToggleIcon"></i>
+                            </div>
+                        </div>
+                        <div class="card-body collapsible-content" id="solutionContent">
+                            <!-- Solution will be displayed here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Video Interview Exercise Tab -->
+        <div class="tab-pane fade" id="interview" role="tabpanel">
+            <div class="feature-title mb-4">
+                <h2><i class="bi bi-camera-video"></i> Video Interview Exercise</h2>
+                <p class="text-muted">Practice with AI-powered video interviews - record your answers and get comprehensive feedback</p>
+            </div>
+
+            <!-- Step 1: Interview Setup -->
+            <div id="interviewSetup" class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="bi bi-person-badge"></i> Setup Your Interview</h5>
+                </div>
+                <div class="card-body">
+                    <form id="interviewSetupForm">
+                        <div class="mb-3">
+                            <label for="interviewRole" class="form-label">Role Applied</label>
+                            <input type="text" class="form-control" id="interviewRole" 
+                                   placeholder="e.g., AI Engineer, Project Manager, Data Scientist" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="interviewType" class="form-label">Interview Type</label>
+                            <select class="form-select" id="interviewType" required>
+                                <option value="Technical Interview">Technical Interview</option>
+                                <option value="HR Interview">HR Interview</option>
+                                <option value="Behavioral Interview">Behavioral Interview</option>
+                                <option value="Case Interview">Case Interview</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="interviewLanguage" class="form-label">Interview Language</label>
+                            <select class="form-select" id="interviewLanguage" required>
+                                <option value="en-US">English (US)</option>
+                                <option value="en-GB">English (UK)</option>
+                                <option value="es-ES">Spanish (Spain)</option>
+                                <option value="es-MX">Spanish (Mexico)</option>
+                                <option value="fr-FR">French</option>
+                                <option value="de-DE">German</option>
+                                <option value="it-IT">Italian</option>
+                                <option value="pt-BR">Portuguese (Brazil)</option>
+                                <option value="pt-PT">Portuguese (Portugal)</option>
+                                <option value="ja-JP">Japanese</option>
+                                <option value="ko-KR">Korean</option>
+                                <option value="zh-CN">Chinese (Simplified)</option>
+                                <option value="zh-TW">Chinese (Traditional)</option>
+                                <option value="hi-IN">Hindi</option>
+                                <option value="ar-SA">Arabic</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="interviewAdditionalInfo" class="form-label">Additional Information (Optional)</label>
+                            <textarea class="form-control" id="interviewAdditionalInfo" rows="2" 
+                                      placeholder="e.g., Years of experience, specific skills to focus on..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                            <i class="bi bi-play-circle"></i> Start Video Interview
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Step 2: Interview Questions (Hidden initially) -->
+            <div id="interviewQuestions" style="display:none;">
+                <div class="row">
+                    <!-- Video Recording Section -->
+                    <div class="col-md-7">
+                        <div class="card mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="bi bi-camera-video"></i> Video Recording</h5>
+                            </div>
+                            <div class="card-body text-center">
+                                <video id="videoPreview" autoplay muted playsinline style="width: 100%; max-height: 400px; background: #000; border-radius: 8px;"></video>
+                                
+                                <!-- Audio Level Indicator -->
+                                <div class="mt-2 d-flex align-items-center justify-content-center" style="gap: 10px;">
+                                    <i class="bi bi-mic-fill" style="color: #6c757d;"></i>
+                                    <div class="progress" style="width: 200px; height: 20px;">
+                                        <div id="audioLevelIndicator" class="progress-bar bg-success" role="progressbar" style="width: 0%; transition: width 0.1s;"></div>
+                                    </div>
+                                    <small id="audioLevelText" class="text-muted">Audio: <span id="audioLevelValue">0</span>%</small>
+                                </div>
+                                
+                                <div class="mt-3">
+                                    <button id="startRecordingBtn" class="btn btn-danger btn-lg" disabled>
+                                        <i class="bi bi-record-circle"></i> Start Recording
+                                    </button>
+                                    <button id="stopRecordingBtn" class="btn btn-secondary btn-lg" style="display:none;">
+                                        <i class="bi bi-stop-circle"></i> Stop Recording
+                                    </button>
+                                </div>
+                                <div id="recordingTimer" class="mt-3" style="display:none;">
+                                    <h3 class="text-danger"><i class="bi bi-clock"></i> <span id="timerDisplay">00:00</span></h3>
+                                    <div class="progress" style="height: 10px;">
+                                        <div id="timerProgress" class="progress-bar bg-danger" role="progressbar" style="width: 0%"></div>
+                                    </div>
+                                    <div class="mt-2">
+                                        <small class="text-muted">
+                                            <i class="bi bi-mic-fill text-danger"></i> Speech-to-text active (powered by Web Speech API)
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question Display Section -->
+                    <div class="col-md-5">
+                        <!-- Overall Interview Timer -->
+                        <div class="card mb-3">
+                            <div class="card-body text-center">
+                                <h6 class="mb-2"><i class="bi bi-stopwatch"></i> Time Remaining</h6>
+                                <h4 id="overallTimer" class="mb-0 text-primary">30:00</h4>
+                                <small class="text-muted">Maximum: 30 minutes</small>
+                            </div>
+                        </div>
+
+                        <div class="card mb-4">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0">
+                                    <i class="bi bi-question-circle"></i> Question <span id="currentQuestionNum">1</span> of <span id="totalQuestions">5</span>
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="questionText" class="alert alert-info">
+                                    <p class="mb-0" style="font-size: 1.1em;"></p>
+                                </div>
+                                <div class="alert alert-warning">
+                                    <i class="bi bi-info-circle"></i> <strong>Time Limit:</strong> <span id="questionTimeLimit">3:00</span> minutes
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Progress Tracker -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0"><i class="bi bi-list-check"></i> Progress</h6>
+                            </div>
+                            <div class="card-body">
+                                <div id="questionProgress"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="text-center mb-4">
+                    <button id="nextQuestionBtn" class="btn btn-primary btn-lg" style="display:none;">
+                        <i class="bi bi-arrow-right"></i> Next Question
+                    </button>
+                    <button id="finishInterviewBtn" class="btn btn-success btn-lg" style="display:none;">
+                        <i class="bi bi-check-circle"></i> Finish Interview
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 3: Feedback Display (Hidden initially) -->
+            <div id="interviewFeedback" style="display:none;">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h4 class="mb-0"><i class="bi bi-clipboard-check"></i> Interview Feedback & Analysis</h4>
+                    </div>
+                    <div class="card-body">
+                        <div id="feedbackContent"></div>
+                        <div class="text-center mt-4">
+                            <button id="newInterviewBtn" class="btn btn-primary btn-lg">
+                                <i class="bi bi-arrow-clockwise"></i> Start New Interview
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/qna.js') }}"></script>
+{% endblock %}
