@@ -99,7 +99,7 @@ Transform how you learn and prepare for technical careers with this all-in-one A
 ### 1. Clone or Navigate to Project Directory
 
 ```bash
-cd "QnA with Datasets"
+cd "ai-powered-apps"
 ```
 
 ### 2. Create Virtual Environment
@@ -113,8 +113,8 @@ source venv/bin/activate  # On Linux/Mac
 
 **Using Conda:**
 ```bash
-conda create -n qna-app python=3.11
-conda activate qna-app
+conda create -n ai-apps python=3.11
+conda activate ai-apps
 ```
 
 ### 3. Install Dependencies
